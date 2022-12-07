@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
+        <meta http-equiv="PRAGMA" content="NO-CACHE">
+        <meta http-equiv="Expires" content="-1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>vueshot | Screen Recording + Network & Console logs</title>
+        <link type="text/css" rel="stylesheet" href="/static/style.css">
+        <link rel="icon" type="image/png"  href="/static/images/fav_18082020.png">
+    </head>
+    <body>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Header -->
+            <header class="header">
+              <div class="brand" onclick="document.location.href='index.html'">
+                <div class="logo-wrapper"><img class="logo-size" src="/static/images/logo_1.svg"></div>
+                <div class="brand-name-label">
+                  <span class="vue-label">VUE</span>
+                  <span class="shot-label">SHOT</span>
+                </div>
+                <!-- <div class="name-margin-top"><span class="vue-label">VUE</span></div>
+                <div style="margin-top: 35px"><span style="margin-left:-27px; font-size: 14px; color: #90a4ae">SHOT</span></div> -->
+
+              </div>
+            </header>
+
+            <!-- Hero -->
+              <form>
+              <div class="Demo Demo--spaced u-ieMinHeightBugFix">
+                <div class="Aligner">
+                  <div class="Aligner-item Aligner-item--fixed">
+                    <div class="sign-in-label">Sign in to record and share issues, defects, queries, and explainer videos</div>
+                    <div class="reg-input-wrapper">
+                      <input id="email" name="email" type="email" placeholder="Email">
+                      <div id="email-err" class=reg-err>&nbsp;</div>
+                    </div>
+                    <div class="reg-input-wrapper">
+                      <input id="password" name="password" type="password" placeholder="Password">
+                      <div id="password-err" class=reg-err>&nbsp;</div>
+                    </div>
+                    <div class="sign-in-err-label-1">&nbsp;</div>
+                    <div class="sign-in-err-label-2">&nbsp;</div>
+                    <div class="button-wrapper">
+                      <span class="forgot-pass-label">Forgot password</span>
+                      <button type="button" class="btn">Sign In</button>
+                    </div>
+                    <div class="sign-in-label" style="padding-top:50px;">(Please <a href="/signup" class="nav-style">signup</a> if you don't have an account.)</div>
+                  </div>
+                </div>
+              </div>
+            </form>
+
+
+
+        </main>
+
+    </body>
+    <script>
+      /* function changeColor() {
+        document.querySelector(".sign-in-err-label-1").innerHTML="Your login information was incorrect.";
+        document.querySelector(".sign-in-err-label-2").innerHTML="Please check and try again.";
+      } */
+      function email() {
+        var emailField = document.querySelector('#email').value;
+        var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        if (!emailField) {
+          document.querySelector('#email-err').innerHTML='Please enter your Email';
+          return null;
+        }
+        var email = String(emailField).trim();
+        if (email && email.length <= 0) {
+          document.querySelector('#email-err').innerHTML='Please enter a valid Email';
+          return null;
+        }
+        var isValidEmail = re.test(email);
+        if (!isValidEmail) {
+          document.querySelector('#email-err').innerHTML='Please enter a valid Email';
+          return null;
+        }
+        return email;
+      }
+      function pass() {
+        var passwordField = document.querySelector('#password').value;
+        if (!passwordField) {
+          document.querySelector('#password-err').innerHTML='Please enter your Password';
+          return null;
+        }
+
+        var pass = String(passwordField);
+        if (pass && pass.length <= 0) {
+          document.querySelector('#password-err').innerHTML='Please enter your Password';
+          return null;
+        }
+
+        return pass;
+      }
+
+      (function() {
+        document.querySelector('.btn').addEventListener('click', function() {
+          document.querySelector('.sign-in-err-label-1').innerHTML='&nbsp;';
+          document.querySelector('.sign-in-err-label-2').innerHTML='&nbsp;';
+          document.querySelector('#email-err').innerHTML='&nbsp;';
+          document.querySelector('#password-err').innerHTML='&nbsp;';
+
+          var eml = email();
+          var pwd = pass();
+          if(!eml || !pwd) {
+            return;
+          }
+
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', '/auth', true);
+          xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+          xhr.send(JSON.stringify({
+            'email': eml,
+            'password': pwd
+          }));
+          xhr.onreadystatechange = function() { // Call a function when the state changes.
+            if (this.readyState === XMLHttpRequest.DONE) {
+              var statusCode = this.status;
+              var response = JSON.parse(xhr.response);
+              document.querySelector('.sign-in-err-label-1').innerHTML='&nbsp;';
+              document.querySelector('.sign-in-err-label-2').innerHTML='&nbsp;';
+              if(!response) {
+                document.querySelector('.sign-in-err-label-1').innerHTML='An unknown error has occurred';
+                return;
+              }
+              switch (statusCode) {
+                case 200: {
+                  window.location.href = '/starter';
+                  return;
+                }
+                case 400:
+                case 404: {
+                  if(!response.error) {
+                    document.querySelector('.sign-in-err-label-1').innerHTML='An unknown error has occurred';
+                    return;
+                  }
+                  var messages = response.error.split('.');
+                  if (messages && messages.length > 0) {
+                    document.querySelector('.sign-in-err-label-1').innerHTML=messages[0]+'.';
+                  }
+                  if (messages && messages.length > 1) {
+                    document.querySelector('.sign-in-err-label-2').innerHTML=messages[1]+'.';
+                  }
+                  return;
+                }
+                default: {
+                  document.querySelector('.sign-in-err-label-1').innerHTML=response.error;
+                  return;
+                }
+              }
+            }
+          }
+        });
+      })();
+    </script>
+</html>

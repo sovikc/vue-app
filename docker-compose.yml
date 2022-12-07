@@ -1,0 +1,15 @@
+version: '3.2'
+services:
+  vueshot.report.db:
+   build:
+     context: ./db
+     dockerfile: Dockerfile
+   restart: always
+   environment:
+     - POSTGRES_DB=vuedb
+     - POSTGRES_USER=postgres
+     - POSTGRES_PASSWORD=postgres
+   ports:
+     - "5432:5432"
+   volumes:
+    - ./var/lib/postgresql/data
